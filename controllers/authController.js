@@ -46,6 +46,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 
 exports.login = catchAsync(async (req, res, next) => {
   // 1) get email and password from request body
+  console.log(req.body);
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -73,6 +74,8 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
 
   if (!token) {
@@ -106,6 +109,36 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // 5) GRANT ACCESS TO THE PROTECTED ROUTE
   req.user = freshUser;
+  next();
+});
+
+// Only for rendered pages
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+  if (req.cookies.jwt) {
+    // verify the token
+    const decoded = await util.promisify(jwt.verify)(
+      req.cookies.jwt,
+      process.env.JWT_SECRET_KEY,
+    );
+
+    // check if user still exists in db
+
+    const freshUser = await User.findById(decoded.id);
+
+    if (!freshUser) {
+      return next();
+    }
+
+    // check if user has changed the password after the token is issued
+
+    if (freshUser.changePasswordAfter(decoded.iat)) {
+      return next();
+    }
+
+    //  Logged in user
+    res.locals.user = freshUser;
+    return next();
+  }
   next();
 });
 

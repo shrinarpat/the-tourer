@@ -11,18 +11,18 @@ dotenv.config({ path: `${__dirname}/../../config.env` });
 const tours = JSON.parse(
   fs.readFileSync(path.join(`${__dirname}/./tours.json`)),
 );
-const reviews = JSON.parse(
-  fs.readFileSync(path.join(`${__dirname}/./reviews.json`)),
-);
-const users = JSON.parse(
-  fs.readFileSync(path.join(`${__dirname}/./users.json`)),
-);
+// const reviews = JSON.parse(
+//   fs.readFileSync(path.join(`${__dirname}/./reviews.json`)),
+// );
+// const users = JSON.parse(
+//   fs.readFileSync(path.join(`${__dirname}/./users.json`)),
+// );
 
 const importData = async () => {
   try {
     await Tour.create(tours);
-    await Review.create(reviews);
-    await User.create(users, { validateBeforeSave: false });
+    // await Review.create(reviews);
+    // await User.create(users, { validateBeforeSave: false });
     console.log('data inserted successfully');
     process.exit(0);
   } catch (err) {
@@ -33,8 +33,8 @@ const importData = async () => {
 const deleteData = async () => {
   try {
     await Tour.deleteMany();
-    await Review.deleteMany();
-    await User.deleteMany();
+    // await Review.deleteMany();
+    // await User.deleteMany();
     console.log('deleted successfully');
     process.exit(0);
   } catch (err) {
