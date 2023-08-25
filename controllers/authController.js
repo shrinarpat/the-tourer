@@ -28,6 +28,17 @@ const createSendToken = (user, statusCode, res) => {
   });
 };
 
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    httpOnly: true,
+    expiresIn: new Date(Date.now() + 10 * 1000),
+  });
+
+  res.status(200).json({
+    status: 'success',
+  });
+};
+
 exports.signup = catchAsync(async (req, res, next) => {
   const { name, email, password, passwordConfirm, role } = req.body;
   const newUser = await User.create({
@@ -46,7 +57,6 @@ exports.signup = catchAsync(async (req, res, next) => {
 
 exports.login = catchAsync(async (req, res, next) => {
   // 1) get email and password from request body
-  console.log(req.body);
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -109,38 +119,43 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // 5) GRANT ACCESS TO THE PROTECTED ROUTE
   req.user = freshUser;
+  res.locals.user = freshUser;
   next();
 });
 
 // Only for rendered pages
-exports.isLoggedIn = catchAsync(async (req, res, next) => {
+exports.isLoggedIn = async (req, res, next) => {
   if (req.cookies.jwt) {
     // verify the token
-    const decoded = await util.promisify(jwt.verify)(
-      req.cookies.jwt,
-      process.env.JWT_SECRET_KEY,
-    );
+    try {
+      const decoded = await util.promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET_KEY,
+      );
 
-    // check if user still exists in db
+      // check if user still exists in db
 
-    const freshUser = await User.findById(decoded.id);
+      const freshUser = await User.findById(decoded.id);
 
-    if (!freshUser) {
+      if (!freshUser) {
+        return next();
+      }
+
+      // check if user has changed the password after the token is issued
+
+      if (freshUser.changePasswordAfter(decoded.iat)) {
+        return next();
+      }
+
+      //  Logged in user
+      res.locals.user = freshUser;
+      return next();
+    } catch (err) {
       return next();
     }
-
-    // check if user has changed the password after the token is issued
-
-    if (freshUser.changePasswordAfter(decoded.iat)) {
-      return next();
-    }
-
-    //  Logged in user
-    res.locals.user = freshUser;
-    return next();
   }
   next();
-});
+};
 
 exports.restrictTo =
   (...roles) =>

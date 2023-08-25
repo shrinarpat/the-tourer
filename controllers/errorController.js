@@ -30,33 +30,62 @@ const handleJWTError = () =>
 const handleTokenExpiredError = () =>
   new AppError('Token is expired, Please login again', 401);
 
-const sendErrorDev = (err, res) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message,
-    error: err,
-    stack: err.stack,
-  });
-};
-
-const sendErrorProd = (err, res) => {
-  //Operational error
-  if (err.isOperational) {
+const sendErrorDev = (err, req, res) => {
+  if (req.originalUrl && req.originalUrl.startsWith('/api')) {
     res.status(err.statusCode).json({
       status: err.status,
       message: err.message,
+      error: err,
+      stack: err.stack,
     });
   } else {
-    // Programming unknown error
-
-    // 1) Log the error
-    console.error('ERROR 🔥', err);
-
-    // 2) Send generic message
-    res.status(500).json({
-      status: 'error',
-      message: 'Something went wrong, please try again later',
+    res.status(err.statusCode).render('error', {
+      title: 'Something went wrong!',
+      msg: err.message,
     });
+  }
+};
+
+const sendErrorProd = (err, req, res) => {
+  if (req.originalUrl && req.originalUrl.startsWith('/api')) {
+    //Operational error
+    if (err.isOperational) {
+      res.status(err.statusCode).json({
+        status: err.status,
+        message: err.message,
+      });
+    } else {
+      // Programming unknown error
+
+      // 1) Log the error
+      console.error('ERROR 🔥', err);
+
+      // 2) Send generic message
+      res.status(500).json({
+        status: 'error',
+        message: 'Something went wrong, please try again later',
+      });
+    }
+  } else {
+    //Operational error
+    // eslint-disable-next-line no-lonely-if
+    if (err.isOperational) {
+      res.status(err.statusCode).render('error', {
+        title: 'Something went wrong!',
+        msg: err.message,
+      });
+    } else {
+      // Programming unknown error
+
+      // 1) Log the error
+      console.error('ERROR 🔥', err);
+
+      // 2) Send generic message
+      res.status(err.statusCode).render('error', {
+        title: 'Something went wrong!',
+        msg: 'Something went wrong, please try again later',
+      });
+    }
   }
 };
 
@@ -65,9 +94,10 @@ module.exports = (err, req, res, next) => {
   err.status = err.status || 'error';
 
   if (process.env.NODE_ENV === 'development') {
-    sendErrorDev(err, res);
+    sendErrorDev(err, req, res);
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
+    error.message = err.message;
     if (error.name === 'CastError') {
       error = handleCastErrorDB(error);
     } else if (error.name === 'MongoError') {
@@ -80,6 +110,6 @@ module.exports = (err, req, res, next) => {
       error = handleTokenExpiredError();
     }
 
-    sendErrorProd(error, res);
+    sendErrorProd(error, req, res);
   }
 };
