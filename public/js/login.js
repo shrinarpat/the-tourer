@@ -4,7 +4,7 @@
 
 const login = async (email, password) => {
   try {
-    let res = await fetch('http://127.0.0.1:3000/api/v1/users/login', {
+    let res = await fetch('/api/v1/users/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -27,7 +27,7 @@ const login = async (email, password) => {
 
 const updateUserData = async (form) => {
   try {
-    let res = await fetch('http://127.0.0.1:3000/api/v1/users/updateMe', {
+    let res = await fetch('/api/v1/users/updateMe', {
       method: 'PATCH',
       body: form,
     });
@@ -49,16 +49,13 @@ const updateUserPassword = async (
   passwordConfirm,
 ) => {
   try {
-    let res = await fetch(
-      'http://127.0.0.1:3000/api/v1/users/updateMyPassword',
-      {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ passwordCurrent, password, passwordConfirm }),
+    let res = await fetch('/api/v1/users/updateMyPassword', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    );
+      body: JSON.stringify({ passwordCurrent, password, passwordConfirm }),
+    });
     res = await res.json();
     if (res.status === 'success') {
       alert('Password Updated Successfully');
@@ -73,7 +70,7 @@ const updateUserPassword = async (
 
 const logout = async () => {
   try {
-    let res = await fetch('http://127.0.0.1:3000/api/v1/users/logout');
+    let res = await fetch('/api/v1/users/logout');
     res = await res.json();
     if (res.status === 'success') {
       window.location.assign('/');
