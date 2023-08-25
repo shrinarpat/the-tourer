@@ -22,7 +22,10 @@ const userSchema = mongoose.Schema({
     enum: ['admin', 'user', 'lead-guide', 'guide'],
     default: 'user',
   },
-  photo: String,
+  photo: {
+    type: String,
+    default: 'default.jpg',
+  },
   password: {
     type: String,
     required: [true, 'Please provide a password'],
@@ -50,14 +53,12 @@ const userSchema = mongoose.Schema({
 });
 
 userSchema.pre('save', async function (next) {
-  console.log('inside pre hook save middleware');
+  // console.log('inside pre hook save middleware');
   // Check if the user password is modified
   if (!this.isModified('password')) return next();
 
   // Generate hash password with cost of 12
   this.password = await bcrypt.hash(this.password, 12);
-
-  console.log(this);
 
   // delete passwordConfirm
   this.passwordConfirm = undefined;
