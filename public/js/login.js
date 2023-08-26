@@ -86,6 +86,7 @@ const loginForm = document.querySelector('.form--login');
 const logout_btn = document.querySelector('.nav__el--logout');
 const updateUserForm = document.querySelector('.form-user-data');
 const updatePasswordForm = document.querySelector('.form-user-settings');
+const alertMessage = document.querySelector('body').dataset.alert;
 
 if (loginForm) {
   loginForm.addEventListener('submit', (event) => {
@@ -121,4 +122,8 @@ if (updatePasswordForm) {
     const passwordConfirm = document.getElementById('password-confirm').value;
     updateUserPassword(passwordCurrent, password, passwordConfirm);
   });
+}
+
+if (alertMessage) {
+  alert(alertMessage);
 }
