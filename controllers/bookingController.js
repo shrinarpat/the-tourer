@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Tour = require('../models/Tour');
 const User = require('../models/User');
@@ -56,13 +57,19 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 // });
 
 const createBookingCheckout = async (session) => {
-  const tour = session.client_reference_id;
-  const user = (await User.findOne({ email: session.customer_email }))._id;
-  const price = session.line_items[0].price_data.unit_amount;
-  await Booking.create({ tour, user, price });
+  console.log('🙌🙌 Inside createBookingCheckout');
+  const { amount_subtotal, client_reference_id, customer_email } = session;
+  const user = (await User.findOne({ email: customer_email }))._id;
+  console.log('💥💥booking ', client_reference_id, user, amount_subtotal);
+  await Booking.create({
+    tour: client_reference_id,
+    user,
+    price: amount_subtotal,
+  });
 };
 
-exports.webHookCheckout = (req, res, next) => {
+exports.webhookCheckout = (req, res, next) => {
+  console.log('inside webhook checkout 🔥🔥');
   const signature = req.headers['stripe-signature'];
   let event;
   try {
@@ -74,8 +81,10 @@ exports.webHookCheckout = (req, res, next) => {
   } catch (err) {
     return res.status(400).send(`Webhook error: ${err.message}`);
   }
-  if (event.type === 'checkout.session.completed')
+  if (event.type === 'checkout.session.completed') {
+    console.log('💥💥 Checkout session completed');
     createBookingCheckout(event.data.object);
+  }
 
   res.status(200).json({
     received: true,

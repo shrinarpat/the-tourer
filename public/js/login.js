@@ -103,16 +103,16 @@ if (logout_btn) {
   });
 }
 
-if (updateUserForm) {
-  updateUserForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const form = new FormData();
-    form.append('name', document.getElementById('name').value);
-    form.append('email', document.getElementById('email').value);
-    form.append('photo', document.getElementById('photo').files[0]);
-    updateUserData(form);
-  });
-}
+// if (updateUserForm) {
+//   updateUserForm.addEventListener('submit', (e) => {
+//     e.preventDefault();
+//     const form = new FormData();
+//     form.append('name', document.getElementById('name').value);
+//     form.append('email', document.getElementById('email').value);
+//     form.append('photo', document.getElementById('photo').files[0]);
+//     updateUserData(form);
+//   });
+// }
 
 if (updatePasswordForm) {
   updatePasswordForm.addEventListener('submit', (e) => {
