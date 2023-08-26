@@ -19,6 +19,8 @@ const globalErrorHandler = require('./controllers/errorController');
 
 const app = express();
 
+app.enable('trust proxy');
+
 // ? 1) MIDDLEWARE  //
 
 app.set('view engine', 'pug');
@@ -30,6 +32,8 @@ app.use(
     origin: '*',
   }),
 );
+
+app.options('*', cors());
 
 // Set security http response header
 app.use(
