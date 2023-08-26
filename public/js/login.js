@@ -3,6 +3,8 @@
 // const { default: axios } = require("axios");
 
 const login = async (email, password) => {
+  const loginBtn = document.getElementById('btn--login');
+  loginBtn.textContent = 'Verifying...';
   try {
     let res = await fetch('/api/v1/users/login', {
       method: 'POST',
@@ -23,6 +25,7 @@ const login = async (email, password) => {
   } catch (err) {
     console.log(err);
   }
+  loginBtn.textContent = 'Login';
 };
 
 const updateUserData = async (form) => {
@@ -103,16 +106,21 @@ if (logout_btn) {
   });
 }
 
-// if (updateUserForm) {
-//   updateUserForm.addEventListener('submit', (e) => {
-//     e.preventDefault();
-//     const form = new FormData();
-//     form.append('name', document.getElementById('name').value);
-//     form.append('email', document.getElementById('email').value);
-//     form.append('photo', document.getElementById('photo').files[0]);
-//     updateUserData(form);
-//   });
-// }
+if (updateUserForm) {
+  updateUserForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const form = new FormData();
+    form.append('name', document.getElementById('name').value);
+    form.append('email', document.getElementById('email').value);
+
+    const files = document.getElementById('photo').files;
+    if (files.length > 0) {
+      form.append('photo', files[0]);
+    }
+
+    updateUserData(form);
+  });
+}
 
 if (updatePasswordForm) {
   updatePasswordForm.addEventListener('submit', (e) => {

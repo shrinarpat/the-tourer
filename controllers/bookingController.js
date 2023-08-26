@@ -3,7 +3,6 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Tour = require('../models/Tour');
 const User = require('../models/User');
 const Booking = require('../models/Booking');
-const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory');
 
@@ -57,10 +56,8 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 // });
 
 const createBookingCheckout = async (session) => {
-  console.log('🙌🙌 Inside createBookingCheckout');
   const { amount_subtotal, client_reference_id, customer_email } = session;
   const user = (await User.findOne({ email: customer_email }))._id;
-  console.log('💥💥booking ', client_reference_id, user, amount_subtotal);
   await Booking.create({
     tour: client_reference_id,
     user,
@@ -69,7 +66,6 @@ const createBookingCheckout = async (session) => {
 };
 
 exports.webhookCheckout = (req, res, next) => {
-  console.log('inside webhook checkout 🔥🔥');
   const signature = req.headers['stripe-signature'];
   let event;
   try {
@@ -82,7 +78,6 @@ exports.webhookCheckout = (req, res, next) => {
     return res.status(400).send(`Webhook error: ${err.message}`);
   }
   if (event.type === 'checkout.session.completed') {
-    console.log('💥💥 Checkout session completed');
     createBookingCheckout(event.data.object);
   }
 
