@@ -52,8 +52,8 @@ exports.signup = catchAsync(async (req, res, next) => {
   // remove password from the user data for client
   newUser.password = undefined;
 
-  const url = `${req.protocol}://${req.get('host')}/me`;
-  await new Email(newUser, url).sendWelcome();
+  // const url = `${req.protocol}://${req.get('host')}/me`;
+  // await new Email(newUser, url).sendWelcome();
 
   createSendToken(newUser, 201, req, res);
 });
