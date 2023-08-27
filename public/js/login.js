@@ -47,10 +47,11 @@ const signUpUser = async (name, email, password, passwordConfirm) => {
         window.location.assign('/');
       }, 1500);
     } else {
-      alert('Error: ', res.message);
+      alert(res.message);
     }
   } catch (err) {
-    alert('Error: ', err.message);
+    console.log(err);
+    alert(err.message);
   }
   signUpBtn.textContent = 'Sign Up';
 };
