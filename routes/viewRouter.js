@@ -17,5 +17,6 @@ router.use(authController.isLoggedIn);
 router.get('/', viewController.getOverview);
 router.get('/tours/:slug', viewController.getTour);
 router.get('/login', viewController.getLogin);
+router.get('/signup', viewController.getSignup);
 
 module.exports = router;

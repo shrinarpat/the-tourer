@@ -28,6 +28,33 @@ const login = async (email, password) => {
   loginBtn.textContent = 'Login';
 };
 
+const signUpUser = async (name, email, password, passwordConfirm) => {
+  const signUpBtn = document.getElementById('btn--signup');
+  signUpBtn.textContent = 'Processing...';
+  try {
+    let res = await fetch('/api/v1/users/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, email, password, passwordConfirm }),
+    });
+
+    res = await res.json();
+    if (res.status === 'success') {
+      alert('You have successfully signed up');
+      window.setTimeout(() => {
+        window.location.assign('/');
+      }, 1500);
+    } else {
+      alert('Error: ', res.message);
+    }
+  } catch (err) {
+    alert('Error: ', err.message);
+  }
+  signUpBtn.textContent = 'Sign Up';
+};
+
 const updateUserData = async (form) => {
   try {
     let res = await fetch('/api/v1/users/updateMe', {
@@ -90,6 +117,23 @@ const logout_btn = document.querySelector('.nav__el--logout');
 const updateUserForm = document.querySelector('.form-user-data');
 const updatePasswordForm = document.querySelector('.form-user-settings');
 const alertMessage = document.querySelector('body').dataset.alert;
+const signupForm = document.querySelector('.form--signup');
+
+if (signupForm) {
+  signupForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = e.target[0].value;
+    const email = e.target[1].value;
+    const password = e.target[2].value;
+    const passwordConfirm = e.target[3].value;
+
+    if (password !== passwordConfirm) {
+      alert('error, password and passwordConfirm are not the same');
+    } else {
+      signUpUser(name, email, password, passwordConfirm);
+    }
+  });
+}
 
 if (loginForm) {
   loginForm.addEventListener('submit', (event) => {

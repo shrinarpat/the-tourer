@@ -71,3 +71,9 @@ exports.getMyBookings = catchAsync(async (req, res) => {
     tours,
   });
 });
+
+exports.getSignup = (req, res) => {
+  res.status(200).render('signup', {
+    title: 'Create Account',
+  });
+};
