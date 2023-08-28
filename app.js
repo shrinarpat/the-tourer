@@ -20,7 +20,7 @@ const bookingController = require('./controllers/bookingController');
 
 const app = express();
 
-app.enable('trust proxy');
+// app.enable('trust proxy');
 
 // ? 1) MIDDLEWARE  //
 
